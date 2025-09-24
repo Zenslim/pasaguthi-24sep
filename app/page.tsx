@@ -4,7 +4,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { supabase } from '@/lib/supabaseClient';
 
-// Minimal starfield paint
+/** Paint a simple starfield background */
 function paintStars() {
   const container = document.querySelector('.stars');
   if (!container) return;
@@ -20,15 +20,17 @@ function paintStars() {
   }
 }
 
+/** Safe Speech hook (TS-robust for SSR/build) */
 function useSpeech() {
-  const recRef = useRef<SpeechRecognition | null>(null);
+  // Use `any` to avoid build-time nullability/type issues on Vercel
+  const recRef = useRef<any>(null);
   const [listening, setListening] = useState(false);
 
   useEffect(() => {
-    const SR = (window as any).webkitSpeechRecognition || (window as any).SpeechRecognition;
+    if (typeof window === 'undefined') return; // SSR guard
+    const SR: any = (window as any).webkitSpeechRecognition || (window as any).SpeechRecognition;
     if (SR) {
-      // Create a local instance first (so TS knows it's non-null), then assign to ref
-      const instance: SpeechRecognition = new SR();
+      const instance = new SR();
       instance.continuous = false;
       instance.lang = 'en-US';
       recRef.current = instance;
@@ -38,25 +40,20 @@ function useSpeech() {
   }, []);
 
   function start(onResult: (t: string) => void) {
-    const r = recRef.current;
+    const r: any = recRef.current;
     if (!r) {
       alert('Speech not supported in this browser.');
       return;
     }
     setListening(true);
-    r.onresult = (e: SpeechRecognitionEvent) => {
-      // aggregate transcripts
+    r.onresult = (e: any) => {
       const text: string = Array.from(e.results)
-        .map((res) => Array.from(res).map((alt) => alt.transcript).join(' '))
+        .map((res: any) => Array.from(res).map((alt: any) => alt.transcript).join(' '))
         .join(' ');
       onResult(text);
     };
     r.onend = () => setListening(false);
-    try {
-      r.start();
-    } catch {
-      setListening(false);
-    }
+    try { r.start(); } catch { setListening(false); }
   }
 
   return { start, listening };
@@ -68,9 +65,7 @@ export default function Whisper() {
   const [count, setCount] = useState<number | null>(null);
   const { start, listening } = useSpeech();
 
-  useEffect(() => {
-    paintStars();
-  }, []);
+  useEffect(() => { paintStars(); }, []);
 
   useEffect(() => {
     (async () => {
