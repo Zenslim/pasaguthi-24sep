@@ -1,0 +1,15 @@
+@tailwind base; @tailwind components; @tailwind utilities;
+html,body{ @apply bg-black text-white min-h-screen; }
+a{ @apply underline; }
+.btn{ @apply px-4 py-2 rounded bg-white text-black hover:opacity-90 transition; }
+.btn-outline{ @apply px-4 py-2 rounded border border-white/10 hover:bg-white hover:text-black transition; }
+.container{ @apply max-w-5xl mx-auto px-4; }
+.card{@apply rounded-xl border border-white/10 bg-white/5 p-5;}
+.input{@apply w-full px-3 py-2 rounded bg-white text-black;}
+.label{@apply text-sm opacity-80;}
+.sidebar-link{@apply flex gap-2 items-center py-2 px-3 rounded hover:bg-white/10;}
+.topbar{@apply fixed top-0 left-0 right-0 bg-slate-900/90 backdrop-blur border-b border-white/10 z-40;}
+.mainwrap{@apply pt-14;}
+/* starfield */
+.stars{ position: fixed; inset:0; z-index:-1; background: radial-gradient(ellipse at bottom, #000 0%, #000 60%, #020617 100%); overflow:hidden;}
+.star{ position:absolute; width:2px; height:2px; border-radius:9999px; background: white; opacity:.8; }
